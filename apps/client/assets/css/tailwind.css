@@ -1,0 +1,428 @@
+@import "tailwindcss";
+
+@import "tw-animate-css";
+
+@import "shadcn-vue/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Scan Nuxt app + workspace UI so `h()` class strings in @uno/ui stay in the build. */
+@source "../../**/*.{vue,ts}";
+@source "../../../../packages/ui/src/**/*.ts";
+
+@layer components {
+  /*
+   * Classic UNO-style faces: thin white rim, colored field, white “stadium” oval tilted ~50°,
+   * corner pips in white. Wild / Wild +4 use black fields and simple vector shapes (no images).
+   * Default size is tuned for the overlapped hand rail; the discard uses the same face for consistency.
+   */
+  /* Shared width token so the hand overlap math stays in sync with the painted card. */
+  .uno-card {
+    --uno-card-w: 8.5rem;
+    --uno-face: #0a0a0a;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    width: var(--uno-card-w);
+    height: calc(var(--uno-card-w) * 3 / 2);
+    margin: 0;
+    padding: 0;
+    flex: 0 0 auto;
+    border-radius: 1.1rem;
+    border: 4px solid #f3f3f3;
+    color: #fff;
+    box-shadow: 0 20px 44px rgb(0 0 0 / 0.32);
+    transition:
+      transform 180ms ease,
+      filter 180ms ease,
+      box-shadow 180ms ease;
+    font-family: ui-rounded, system-ui, sans-serif;
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+    contain: layout;
+  }
+
+  button.uno-card {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .uno-card--face {
+    cursor: default;
+    user-select: none;
+  }
+
+  .uno-card--eligible {
+    /* Pop up like a physical card you’re pinching — same z-order as the rest of the hand (see
+       HandRail) so cards to the right don’t get covered; vertical lift keeps their color strips readable. */
+    transform: translateY(-1.75rem) scale(1.04);
+    filter: brightness(1.1) saturate(1.06);
+    box-shadow:
+      0 16px 36px rgb(0 0 0 / 0.36),
+      0 0 0 2px rgb(255 255 255 / 0.95),
+      0 0 22px 3px var(--primary);
+  }
+
+  .uno-card:disabled {
+    filter: grayscale(0.35) brightness(0.72);
+  }
+
+  .uno-card--red {
+    --uno-face: #d91910;
+    background: #e92823;
+  }
+  .uno-card--yellow {
+    --uno-face: #c9a000;
+    background: #ffce21;
+  }
+  .uno-card--green {
+    --uno-face: #007a33;
+    background: #00a651;
+  }
+  .uno-card--blue {
+    --uno-face: #0047ab;
+    background: #0063b1;
+  }
+
+  .uno-card--wild,
+  .uno-card--wild4 {
+    --uno-face: #fff;
+    background: #0d0d0d;
+  }
+
+  .uno-card__pip {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    text-shadow: 0 0.08rem 0 rgb(0 0 0 / 0.12);
+  }
+
+  .uno-card__pip--tl {
+    top: 0.36rem;
+    left: 0.4rem;
+  }
+
+  .uno-card__pip--br {
+    bottom: 0.36rem;
+    right: 0.4rem;
+    transform: rotate(180deg);
+  }
+
+  .uno-card__pip-inner {
+    display: block;
+    font-size: 1.26rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* UNO prints a bar under 6 and 9 so you can tell which way is up — same idea here. */
+  .uno-card__pip--orient,
+  .uno-card__center-inner.uno-card__pip--orient {
+    text-decoration: underline;
+    text-underline-offset: 0.06em;
+    text-decoration-thickness: 0.08em;
+  }
+
+  .uno-card__pip-icon,
+  .uno-card__center-icon {
+    display: block;
+    color: currentcolor;
+  }
+
+  .uno-card__pip-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .uno-card__oval {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 82%;
+    height: 48%;
+    background: #fff;
+    border-radius: 999px;
+    transform: translate(-50%, -50%) rotate(-52deg);
+    box-shadow: inset 0 -0.12rem 0 rgb(0 0 0 / 0.06);
+    color: var(--uno-face);
+  }
+
+  .uno-card__center-glyph {
+    transform: rotate(52deg);
+    font-size: 3.24rem;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+  }
+
+  .uno-card__draw2 {
+    font-size: 2.56rem;
+    letter-spacing: -0.06em;
+  }
+
+  .uno-card__center-icon {
+    width: 5.2rem;
+    height: 5.2rem;
+    transform: rotate(52deg);
+  }
+
+  .uno-card__wild-oval {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 78%;
+    height: 46%;
+    overflow: hidden;
+    border-radius: 999px;
+    transform: translate(-50%, -50%) rotate(-50deg);
+    outline: 4px solid #f3f3f3;
+    outline-offset: -2px;
+  }
+
+  .uno-card__wild-cell--r {
+    background: #e92823;
+  }
+  .uno-card__wild-cell--y {
+    background: #ffce21;
+  }
+  .uno-card__wild-cell--g {
+    background: #00a651;
+  }
+  .uno-card__wild-cell--b {
+    background: #0063b1;
+  }
+
+  .uno-card__wild4-bars {
+    position: absolute;
+    inset: 0.76rem;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .uno-card__wild4-bar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 38%;
+    height: 58%;
+    margin: -29% 0 0 -19%;
+    border-radius: 0.2rem;
+    border: 0.12rem solid rgb(0 0 0 / 0.28);
+    box-shadow: 0 0.24rem 0 rgb(0 0 0 / 0.25);
+  }
+
+  .uno-card__wild4-bar--r {
+    background: #e92823;
+    transform: rotate(-16deg) translate(-18%, -6%);
+    z-index: 1;
+  }
+  .uno-card__wild4-bar--y {
+    background: #ffce21;
+    transform: rotate(-6deg) translate(4%, -2%);
+    z-index: 2;
+  }
+  .uno-card__wild4-bar--g {
+    background: #00a651;
+    transform: rotate(6deg) translate(18%, 2%);
+    z-index: 3;
+  }
+  .uno-card__wild4-bar--b {
+    background: #0063b1;
+    transform: rotate(18deg) translate(32%, 8%);
+    z-index: 4;
+  }
+
+  /* Bottom hand: heavy horizontal overlap (~24% of card width visible per step), rightmost on top. */
+  .uno-hand-rail {
+    /* Must live here (not only on .uno-card): slot margins use this and custom props don’t bubble up from children. */
+    --uno-card-w: 8.5rem;
+    --uno-hand-peek: 2.04rem;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0;
+    min-height: 19.5rem;
+    padding: 3.4rem 1.5rem 1rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
+  }
+
+  .uno-hand-rail__slot {
+    position: relative;
+    flex: 0 0 auto;
+    transform-origin: 50% 100%;
+    transition: transform 0.22s ease;
+  }
+
+  .uno-hand-rail__slot:not(:first-child) {
+    margin-left: calc(-1 * (var(--uno-card-w) - var(--uno-hand-peek)));
+  }
+}
+
+@theme inline {
+  --font-sans: 'Geist Variable', sans-serif;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Light UNO shell: warm paper + sunny yellow CTAs (same accent language as `.dark`). */
+:root {
+  --background: oklch(0.985 0.014 95);
+  --foreground: oklch(0.24 0.045 270);
+  --card: oklch(0.995 0.01 95);
+  --card-foreground: oklch(0.24 0.045 270);
+  --popover: oklch(0.995 0.01 95);
+  --popover-foreground: oklch(0.24 0.045 270);
+  --primary: oklch(0.86 0.16 92);
+  --primary-foreground: oklch(0.22 0.06 270);
+  --secondary: oklch(0.96 0.022 95);
+  --secondary-foreground: oklch(0.28 0.04 270);
+  --muted: oklch(0.945 0.02 95);
+  --muted-foreground: oklch(0.48 0.03 270);
+  --accent: oklch(0.94 0.03 95);
+  --accent-foreground: oklch(0.24 0.045 270);
+  --destructive: oklch(0.55 0.22 27);
+  --border: oklch(0.9 0.025 95);
+  --input: oklch(0.92 0.02 95);
+  --ring: oklch(0.72 0.14 92);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.98 0.012 95);
+  --sidebar-foreground: oklch(0.24 0.045 270);
+  --sidebar-primary: oklch(0.86 0.16 92);
+  --sidebar-primary-foreground: oklch(0.22 0.06 270);
+  --sidebar-accent: oklch(0.95 0.02 95);
+  --sidebar-accent-foreground: oklch(0.28 0.04 270);
+  --sidebar-border: oklch(0.9 0.025 95);
+  --sidebar-ring: oklch(0.72 0.14 92);
+}
+
+/* Dark UNO shell: deep indigo canvas + warm yellow primary for CTAs */
+.dark {
+  --background: oklch(0.17 0.05 270);
+  --foreground: oklch(0.96 0.02 95);
+  --card: oklch(0.22 0.055 270);
+  --card-foreground: oklch(0.96 0.02 95);
+  --popover: oklch(0.21 0.055 270);
+  --popover-foreground: oklch(0.96 0.02 95);
+  --primary: oklch(0.88 0.17 92);
+  --primary-foreground: oklch(0.2 0.04 270);
+  --secondary: oklch(0.28 0.06 270);
+  --secondary-foreground: oklch(0.96 0.02 95);
+  --muted: oklch(0.28 0.04 270);
+  --muted-foreground: oklch(0.72 0.03 95);
+  --accent: oklch(0.3 0.08 270);
+  --accent-foreground: oklch(0.96 0.02 95);
+  --destructive: oklch(0.58 0.22 25);
+  --border: oklch(0.96 0.02 95 / 12%);
+  --input: oklch(0.96 0.02 95 / 14%);
+  --ring: oklch(0.78 0.14 92);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.2 0.05 270);
+  --sidebar-foreground: oklch(0.96 0.02 95);
+  --sidebar-primary: oklch(0.88 0.17 92);
+  --sidebar-primary-foreground: oklch(0.2 0.04 270);
+  --sidebar-accent: oklch(0.28 0.06 270);
+  --sidebar-accent-foreground: oklch(0.96 0.02 95);
+  --sidebar-border: oklch(0.96 0.02 95 / 12%);
+  --sidebar-ring: oklch(0.78 0.14 92);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply min-h-dvh bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@keyframes uno-pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+/* Match “Players” heading: chevrons nudge with the live turn direction (clockwise vs counter). */
+@keyframes uno-dir-cw {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(5px);
+  }
+}
+
+@keyframes uno-dir-ccw {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-5px);
+  }
+}

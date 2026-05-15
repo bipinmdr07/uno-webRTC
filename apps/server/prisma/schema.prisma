@@ -1,0 +1,6 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+model Player { id String @id username String avatar String xp Int @default(0) createdAt DateTime @default(now()) }
+model Match { id String @id roomId String seed String winnerId String? createdAt DateTime @default(now()) events MatchEvent[] }
+model MatchEvent { id String @id matchId String seq Int type String payload Json hash String match Match @relation(fields: [matchId], references: [id]) }

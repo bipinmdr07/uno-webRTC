@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uno-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: uno-server
+  template:
+    metadata:
+      labels:
+        app: uno-server
+    spec:
+      containers:
+        - name: server
+          image: uno/server:latest
+          ports:
+            - containerPort: 4100
+          envFrom:
+            - secretRef:
+                name: uno-server-env
