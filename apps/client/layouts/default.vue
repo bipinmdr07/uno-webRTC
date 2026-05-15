@@ -11,19 +11,20 @@ const isDark = useDark({ initialValue: 'dark' });
   <TooltipProvider>
     <div class="relative flex min-h-dvh flex-col">
       <div
-        class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,oklch(0.88_0.1_92/0.45),transparent_55%),radial-gradient(ellipse_80%_50%_at_100%_50%,oklch(0.72_0.14_25/0.14),transparent),radial-gradient(ellipse_60%_40%_at_0%_80%,oklch(0.92_0.06_95/0.35),transparent)] dark:bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,oklch(0.45_0.18_270/0.35),transparent_55%),radial-gradient(ellipse_80%_50%_at_100%_50%,oklch(0.55_0.12_300/0.12),transparent),radial-gradient(ellipse_60%_40%_at_0%_80%,oklch(0.75_0.14_92/0.08),transparent)]"
+        class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,oklch(0.85_0.18_92/0.15),transparent_55%),radial-gradient(ellipse_80%_50%_at_100%_50%,oklch(0.7_0.15_25/0.1),transparent),radial-gradient(ellipse_60%_40%_at_0%_80%,oklch(0.8_0.16_95/0.2),transparent)] dark:bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,oklch(0.35_0.15_270/0.4),transparent_55%),radial-gradient(ellipse_80%_50%_at_100%_50%,oklch(0.45_0.1_300/0.15),transparent),radial-gradient(ellipse_60%_40%_at_0%_80%,oklch(0.55_0.12_92/0.1),transparent)]"
         aria-hidden="true"
       />
+      <div class="uno-table-surface" aria-hidden="true" />
       <header
-        class="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60"
+        class="sticky top-0 z-50 border-b border-white/10 bg-black/5 backdrop-blur-xl supports-[backdrop-filter]:bg-black/5"
       >
-        <div class="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <NuxtLink to="/" class="group flex items-center gap-2 font-semibold tracking-tight text-foreground">
+        <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+          <NuxtLink to="/" class="group flex items-center gap-3 font-bold tracking-tighter text-white">
             <span
-              class="flex size-8 items-center justify-center rounded-lg bg-primary text-lg text-primary-foreground shadow-sm transition group-hover:brightness-110"
+              class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-xl text-primary-foreground shadow-lg transition group-hover:scale-110 group-hover:rotate-6"
               aria-hidden="true"
             >🃏</span>
-            <span class="text-sm sm:text-base">UNO <span class="text-muted-foreground">WebRTC</span></span>
+            <span class="text-lg sm:text-xl uppercase">UNO <span class="text-primary opacity-80">WebRTC</span></span>
           </NuxtLink>
           <div class="flex items-center gap-1 sm:gap-2">
             <Button v-if="showHome" variant="ghost" size="sm" as-child>

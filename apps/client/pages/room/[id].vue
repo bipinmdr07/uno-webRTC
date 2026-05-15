@@ -532,11 +532,12 @@ function callUno() {
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col gap-8 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">Room</p>
-        <h1 class="mt-1 font-mono text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{{ roomId }}</h1>
+  <div class="flex min-h-0 flex-1 flex-col gap-8 pb-[max(1.5rem,env(safe-area-inset-bottom))] relative overflow-hidden">
+    <div class="uno-table-surface" aria-hidden="true" />
+    <div class="flex flex-wrap items-start justify-between gap-4 relative z-10">
+      <div class="glass px-4 py-2 rounded-xl">
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Match Room</p>
+        <h1 class="font-mono text-lg font-bold tracking-tight text-white sm:text-xl">{{ roomId }}</h1>
       </div>
     </div>
 
@@ -699,177 +700,105 @@ function callUno() {
     </Card>
 
     <template v-else-if="match.state">
-      <Card class="relative overflow-visible border-border/80 shadow-lg">
-        <div
-          class="pointer-events-none absolute inset-0 opacity-30 blur-3xl"
-          aria-hidden="true"
-        >
-          <div class="absolute inset-0 bg-gradient-to-br from-primary/25 via-fuchsia-500/15 to-sky-500/20" />
+      <div class="relative z-10 flex flex-col gap-6">
+        <!-- Players Ring -->
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            v-for="player in match.state.players"
+            :key="player.id"
+            class="relative min-w-0"
+          >
+            <PlayerPanel
+              :player="player"
+              :active="player.id === match.state.activePlayerId"
+              :card-count="match.state.hands[player.id]?.length ?? 0"
+            />
+          </div>
         </div>
-        <CardContent class="relative space-y-8 pt-8">
-          <div>
-            <div
-              class="flex items-center justify-center gap-2 sm:gap-3"
-              :title="
-                match.state.direction === 1 ? 'Turn order: clockwise' : 'Turn order: counter-clockwise'
-              "
+
+        <!-- Central Table Area -->
+        <div class="relative flex flex-col items-center justify-center py-12 sm:py-20">
+          <!-- Direction Indicator -->
+          <div 
+            class="absolute inset-0 flex items-center justify-center pointer-events-none"
+            :class="turnDirAnimClass"
+          >
+            <div class="size-[20rem] sm:size-[28rem] rounded-full border-[12px] border-dashed border-white/5 opacity-20" />
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-12 sm:gap-24 relative z-10">
+            <!-- Draw Pile -->
+            <button 
+              type="button"
+              class="group relative flex flex-col items-center gap-3 transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+              :disabled="!isMyTurn || match.state.status !== 'playing'"
+              @click="drawFromDeck"
             >
-              <div class="flex items-center gap-px text-primary/90 sm:gap-0.5" aria-hidden="true">
-                <component
-                  :is="turnDirChevron"
-                  v-for="step in 3"
-                  :key="`L-${step}`"
-                  class="size-[1.05rem] shrink-0 sm:size-5"
-                  :class="turnDirAnimClass"
-                  :style="{ animationDelay: `${(step - 1) * 0.16}s` }"
-                />
+              <div class="relative">
+                <!-- Stacked card effect -->
+                <div class="absolute -inset-1 rounded-[1.1rem] bg-black/20 translate-y-2 translate-x-1" />
+                <div class="absolute -inset-1 rounded-[1.1rem] bg-black/20 translate-y-1 translate-x-0.5" />
+                <div class="uno-card uno-card--wild flex items-center justify-center border-white/40 bg-slate-900 shadow-2xl">
+                  <span class="text-4xl font-black italic tracking-tighter text-white/20 select-none">UNO</span>
+                </div>
               </div>
-              <p class="text-center text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                Players
-              </p>
-              <div class="flex items-center gap-px text-primary/90 sm:gap-0.5" aria-hidden="true">
-                <component
-                  :is="turnDirChevron"
-                  v-for="step in 3"
-                  :key="`R-${step}`"
-                  class="size-[1.05rem] shrink-0 sm:size-5"
-                  :class="turnDirAnimClass"
-                  :style="{ animationDelay: `${(step - 1) * 0.16 + 0.08}s` }"
-                />
+              <div class="glass px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
+                Deck ({{ deckCount }})
               </div>
-            </div>
-            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div
-                v-for="player in match.state.players"
-                :key="player.id"
-                class="relative min-w-0"
+            </button>
+
+            <!-- Discard Pile -->
+            <div class="flex flex-col items-center gap-3">
+              <div class="relative">
+                <div class="absolute -inset-4 rounded-full bg-white/5 blur-2xl" />
+                <UnoCardFace v-if="topDiscard" :card="topDiscard" class="relative z-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
+                <div v-else class="uno-card border-dashed border-white/10 bg-white/5" />
+              </div>
+              <div 
+                class="glass px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg flex items-center gap-2"
+                :style="activeColorStyle"
               >
-                <PlayerPanel
-                  :player="player"
-                  :active="player.id === match.state.activePlayerId"
-                  :card-count="match.state.hands[player.id]?.length ?? 0"
-                />
+                <span class="size-2 rounded-full bg-white animate-pulse" />
+                {{ match.state.currentColor || 'No Color' }}
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <!-- overflow-visible so lifted playable cards (.uno-card--eligible) aren’t clipped by the card chrome -->
-      <Card class="overflow-visible border-border/80 shadow-md">
-        <CardContent class="flex flex-col gap-4 pt-6">
-          <Alert v-if="!match.state.players.some((p) => p.id === identity.playerId)" variant="destructive">
+        <!-- Hand Area -->
+        <div class="mt-auto relative">
+          <Alert v-if="!match.state.players.some((p) => p.id === identity.playerId)" variant="destructive" class="mb-4">
             <AlertTitle>Wrong seat</AlertTitle>
             <AlertDescription>
-              Your player id is not in this match (wrong device or cleared storage). Re-open the invite link in this browser before the host starts.
+              Your player id is not in this match. Re-open the invite link.
             </AlertDescription>
           </Alert>
-          <div class="flex flex-wrap items-end justify-center gap-8 border-b border-border/60 pb-8">
-            <div class="text-center">
-              <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">Active color</p>
-              <div
-                class="mx-auto mt-3 h-12 w-12 rounded-xl border-2 border-border shadow-md"
-                :style="activeColorStyle"
-                :title="match.state.currentColor"
+          
+          <div class="relative glass rounded-[2rem] p-4 sm:p-6 shadow-2xl border-white/10">
+            <HandRail :viewer-id="identity.playerId" :cards="match.state.hands[identity.playerId] ?? []" :state="match.state" @play="play" />
+            
+            <div class="absolute bottom-6 left-6 z-20 flex flex-wrap items-end gap-3">
+              <Button
+                v-if="mustDrawNoPlayable || drawnPlayableOffer"
+                type="button"
+                variant="secondary"
+                size="lg"
+                class="glass border-white/20 hover:bg-white/20"
+                @click="drawnPlayableOffer ? passAfterDraw() : drawFromDeck()"
+              >
+                {{ drawnPlayableOffer ? 'Pass Turn' : 'Draw Card' }}
+              </Button>
+              
+              <UnoButton 
+                v-if="canPressUno"
+                :enabled="true"
+                urgent
+                @uno="callUno"
               />
             </div>
-            <div class="text-center">
-              <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">Top discard</p>
-              <UnoCardFace v-if="topDiscard" :card="topDiscard" class="mx-auto mt-3" />
-              <p v-else class="mt-4 text-sm text-muted-foreground">—</p>
-            </div>
-            <div class="text-center text-foreground">
-              <p class="text-xs font-medium uppercase tracking-widest text-muted-foreground">Deck</p>
-              <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight">{{ deckCount }}</p>
-              <div class="mt-3 flex justify-center">
-                <DirectionArrow :direction="match.state.direction" />
-              </div>
-            </div>
           </div>
-          <div class="flex w-full flex-col gap-2">
-            <div class="relative w-full">
-              <HandRail :viewer-id="identity.playerId" :cards="match.state.hands[identity.playerId] ?? []" :state="match.state" @play="play" />
-              <!-- Same vertical plane as the fan; only the hint strip sits below in normal flow -->
-              <div
-                class="pointer-events-none absolute bottom-2 left-2 z-20 flex max-w-[min(19rem,calc(100%-5.75rem))] flex-wrap items-end gap-2 sm:bottom-3 sm:left-3"
-              >
-                <div class="pointer-events-auto flex flex-wrap items-end gap-2">
-                  <Button
-                    type="button"
-                    :variant="mustDrawNoPlayable ? 'default' : 'secondary'"
-                    size="lg"
-                    class="flex min-h-[5.75rem] min-w-[5.75rem] flex-col items-center justify-center gap-2 rounded-2xl px-3 py-2.5 shadow-md transition-[box-shadow,transform]"
-                    :class="
-                      mustDrawNoPlayable
-                        && 'ring-2 ring-primary ring-offset-2 ring-offset-background animate-[uno-pulse_0.65s_ease-in-out_infinite_alternate]'
-                    "
-                    :disabled="match.state.status !== 'playing' || !isMyTurn || drawnPlayableOffer"
-                    :aria-describedby="mustDrawNoPlayable ? 'draw-required-hint' : drawnPlayableOffer ? 'drawn-playable-hint' : undefined"
-                    @click="drawFromDeck"
-                  >
-                    <span class="relative mx-auto flex h-11 w-[4.5rem] shrink-0 items-end justify-center" aria-hidden="true">
-                      <span
-                        class="absolute bottom-0 left-1 h-10 w-8 rotate-[-12deg] rounded-md border-2 border-slate-900/40 bg-blue-800 shadow-sm"
-                      />
-                      <span
-                        class="absolute bottom-0 left-1/2 h-10 w-8 -translate-x-1/2 rotate-[5deg] rounded-md border-2 border-slate-900/45 bg-blue-600 shadow-md"
-                      />
-                      <span
-                        class="absolute bottom-0.5 left-1/2 h-10 w-8 -translate-x-1/2 rounded-md border-2 border-slate-900/50 bg-gradient-to-b from-sky-500 to-blue-950 shadow-lg ring-1 ring-white/20"
-                      />
-                    </span>
-                    <span class="max-w-[5.5rem] text-center text-[0.7rem] font-bold uppercase leading-tight tracking-wide">
-                      {{ pendingStackDraw > 0 ? `Take ${pendingStackDraw}` : 'Draw' }}
-                    </span>
-                  </Button>
-                  <Button
-                    v-if="drawnPlayableOffer"
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    class="min-h-11 min-w-[6.5rem] shrink-0"
-                    :disabled="match.state.status !== 'playing'"
-                    @click="passAfterDraw"
-                  >
-                    Pass
-                  </Button>
-                </div>
-              </div>
-              <div class="pointer-events-none absolute bottom-2 right-2 z-20 sm:bottom-3 sm:right-3">
-                <div class="pointer-events-auto">
-                  <UnoButton :enabled="canPressUno" :urgent="canPressUno" @uno="callUno" />
-                </div>
-              </div>
-            </div>
-            <div
-              v-if="!isMyTurn || mustDrawNoPlayable || drawnPlayableOffer"
-              class="w-full rounded-lg border border-border/60 bg-muted/30 px-2.5 py-2 text-center shadow-sm sm:text-left"
-            >
-              <p v-if="!isMyTurn" class="text-pretty text-sm text-muted-foreground">Waiting for your turn…</p>
-              <p
-                v-else-if="mustDrawNoPlayable"
-                id="draw-required-hint"
-                class="text-pretty text-sm font-medium text-primary"
-              >
-                <template v-if="pendingStackDraw > 0">
-                  <template v-if="topDiscard?.type === 'wild4'">
-                    No Wild +4 to add — take the {{ pendingStackDraw }} stacked cards.
-                  </template>
-                  <template v-else>No +2 or Wild +4 to add — take the {{ pendingStackDraw }} stacked cards.</template>
-                </template>
-                <template v-else>No matching card — draw from the deck.</template>
-              </p>
-              <p
-                v-else-if="drawnPlayableOffer"
-                id="drawn-playable-hint"
-                class="text-pretty text-sm font-medium text-primary"
-              >
-                That draw matches the pile — play the highlighted card or pass to keep it and end your turn.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </template>
 
     <Dialog v-model:open="gameOverDialogOpen">

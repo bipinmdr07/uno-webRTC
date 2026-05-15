@@ -29,18 +29,25 @@
     padding: 0;
     flex: 0 0 auto;
     border-radius: 1.1rem;
-    border: 4px solid #f3f3f3;
+    border: 3px solid rgba(255, 255, 255, 0.9);
     color: #fff;
-    box-shadow: 0 20px 44px rgb(0 0 0 / 0.32);
+    box-shadow: 
+      0 10px 30px -5px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(0, 0, 0, 0.1),
+      inset 0 0 15px rgba(255, 255, 255, 0.1);
     transition:
-      transform 180ms ease,
-      filter 180ms ease,
-      box-shadow 180ms ease;
+      transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      filter 250ms ease,
+      box-shadow 250ms ease;
     font-family: ui-rounded, system-ui, sans-serif;
     font-weight: 900;
     line-height: 1;
     text-align: center;
     contain: layout;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 2px 2px;
   }
 
   button.uno-card {
@@ -55,41 +62,61 @@
   }
 
   .uno-card--eligible {
-    /* Pop up like a physical card you’re pinching — same z-order as the rest of the hand (see
-       HandRail) so cards to the right don’t get covered; vertical lift keeps their color strips readable. */
-    transform: translateY(-1.75rem) scale(1.04);
-    filter: brightness(1.1) saturate(1.06);
+    transform: translateY(-2.5rem) scale(1.08) rotate(2deg);
+    filter: brightness(1.15) saturate(1.1);
     box-shadow:
-      0 16px 36px rgb(0 0 0 / 0.36),
-      0 0 0 2px rgb(255 255 255 / 0.95),
-      0 0 22px 3px var(--primary);
+      0 25px 50px -12px rgba(0, 0, 0, 0.6),
+      0 0 0 2px rgba(255, 255, 255, 1),
+      0 0 30px 5px var(--primary);
+    z-index: 50 !important;
   }
 
   .uno-card:disabled {
-    filter: grayscale(0.35) brightness(0.72);
+    filter: grayscale(0.5) brightness(0.6);
+    opacity: 0.8;
   }
 
   .uno-card--red {
-    --uno-face: #d91910;
-    background: #e92823;
+    --uno-face: #c51605;
+    background-color: #ef4444;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%),
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
   .uno-card--yellow {
-    --uno-face: #c9a000;
-    background: #ffce21;
+    --uno-face: #a16207;
+    background-color: #facc15;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 40%),
+      linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   }
   .uno-card--green {
-    --uno-face: #007a33;
-    background: #00a651;
+    --uno-face: #14532d;
+    background-color: #22c55e;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%),
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
   .uno-card--blue {
-    --uno-face: #0047ab;
-    background: #0063b1;
+    --uno-face: #1e3a8a;
+    background-color: #3b82f6;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%),
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
 
   .uno-card--wild,
   .uno-card--wild4 {
     --uno-face: #fff;
-    background: #0d0d0d;
+    background-color: #111827;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), transparent 40%),
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   }
 
   .uno-card__pip {
@@ -99,44 +126,44 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 1.2rem;
-    text-shadow: 0 0.08rem 0 rgb(0 0 0 / 0.12);
+    font-size: 1.3rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .uno-card__pip--tl {
-    top: 0.36rem;
-    left: 0.4rem;
+    top: 0.5rem;
+    left: 0.5rem;
   }
 
   .uno-card__pip--br {
-    bottom: 0.36rem;
-    right: 0.4rem;
+    bottom: 0.5rem;
+    right: 0.5rem;
     transform: rotate(180deg);
   }
 
   .uno-card__pip-inner {
     display: block;
-    font-size: 1.26rem;
-    letter-spacing: -0.02em;
+    font-size: 1.4rem;
+    letter-spacing: -0.05em;
   }
 
-  /* UNO prints a bar under 6 and 9 so you can tell which way is up — same idea here. */
   .uno-card__pip--orient,
   .uno-card__center-inner.uno-card__pip--orient {
     text-decoration: underline;
     text-underline-offset: 0.06em;
-    text-decoration-thickness: 0.08em;
+    text-decoration-thickness: 0.1em;
   }
 
   .uno-card__pip-icon,
   .uno-card__center-icon {
     display: block;
     color: currentcolor;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
   }
 
   .uno-card__pip-icon {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.6rem;
+    height: 1.6rem;
   }
 
   .uno-card__oval {
@@ -147,30 +174,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 82%;
-    height: 48%;
-    background: #fff;
+    width: 84%;
+    height: 50%;
+    background: #ffffff;
     border-radius: 999px;
     transform: translate(-50%, -50%) rotate(-52deg);
-    box-shadow: inset 0 -0.12rem 0 rgb(0 0 0 / 0.06);
+    box-shadow: 
+      0 4px 10px rgba(0, 0, 0, 0.1),
+      inset 0 -2px 5px rgba(0, 0, 0, 0.05);
     color: var(--uno-face);
   }
 
   .uno-card__center-glyph {
     transform: rotate(52deg);
-    font-size: 3.24rem;
-    letter-spacing: -0.04em;
-    line-height: 0.85;
+    font-size: 3.8rem;
+    letter-spacing: -0.05em;
+    line-height: 0.8;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .uno-card__draw2 {
-    font-size: 2.56rem;
-    letter-spacing: -0.06em;
+    font-size: 2.8rem;
+    letter-spacing: -0.08em;
   }
 
   .uno-card__center-icon {
-    width: 5.2rem;
-    height: 5.2rem;
+    width: 5.5rem;
+    height: 5.5rem;
     transform: rotate(52deg);
   }
 
@@ -182,31 +212,24 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    width: 78%;
-    height: 46%;
+    width: 80%;
+    height: 48%;
     overflow: hidden;
     border-radius: 999px;
     transform: translate(-50%, -50%) rotate(-50deg);
-    outline: 4px solid #f3f3f3;
-    outline-offset: -2px;
+    outline: 5px solid #fff;
+    outline-offset: -1px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 
-  .uno-card__wild-cell--r {
-    background: #e92823;
-  }
-  .uno-card__wild-cell--y {
-    background: #ffce21;
-  }
-  .uno-card__wild-cell--g {
-    background: #00a651;
-  }
-  .uno-card__wild-cell--b {
-    background: #0063b1;
-  }
+  .uno-card__wild-cell--r { background-color: #ef4444; }
+  .uno-card__wild-cell--y { background-color: #facc15; }
+  .uno-card__wild-cell--g { background-color: #22c55e; }
+  .uno-card__wild-cell--b { background-color: #3b82f6; }
 
   .uno-card__wild4-bars {
     position: absolute;
-    inset: 0.76rem;
+    inset: 0.8rem;
     z-index: 1;
     pointer-events: none;
   }
@@ -215,67 +238,81 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 38%;
-    height: 58%;
-    margin: -29% 0 0 -19%;
-    border-radius: 0.2rem;
-    border: 0.12rem solid rgb(0 0 0 / 0.28);
-    box-shadow: 0 0.24rem 0 rgb(0 0 0 / 0.25);
+    width: 40%;
+    height: 60%;
+    margin: -30% 0 0 -20%;
+    border-radius: 0.25rem;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
   }
 
   .uno-card__wild4-bar--r {
-    background: #e92823;
-    transform: rotate(-16deg) translate(-18%, -6%);
+    background-color: #ef4444;
+    transform: rotate(-15deg) translate(-20%, -8%);
     z-index: 1;
   }
   .uno-card__wild4-bar--y {
-    background: #ffce21;
-    transform: rotate(-6deg) translate(4%, -2%);
+    background-color: #facc15;
+    transform: rotate(-5deg) translate(5%, -3%);
     z-index: 2;
   }
   .uno-card__wild4-bar--g {
-    background: #00a651;
-    transform: rotate(6deg) translate(18%, 2%);
+    background-color: #22c55e;
+    transform: rotate(7deg) translate(20%, 3%);
     z-index: 3;
   }
   .uno-card__wild4-bar--b {
-    background: #0063b1;
-    transform: rotate(18deg) translate(32%, 8%);
+    background-color: #3b82f6;
+    transform: rotate(20deg) translate(35%, 10%);
     z-index: 4;
   }
 
-  /* Bottom hand: heavy horizontal overlap (~24% of card width visible per step), rightmost on top. */
   .uno-hand-rail {
-    /* Must live here (not only on .uno-card): slot margins use this and custom props don’t bubble up from children. */
     --uno-card-w: 8.5rem;
-    --uno-hand-peek: 2.04rem;
+    --uno-hand-peek: 2.2rem;
     display: flex;
     flex-flow: row nowrap;
     align-items: flex-end;
     justify-content: center;
     gap: 0;
-    min-height: 19.5rem;
-    padding: 3.4rem 1.5rem 1rem;
+    min-height: 20rem;
+    padding: 4rem 1.5rem 1.5rem;
     overflow-x: auto;
     overflow-y: visible;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .uno-hand-rail::-webkit-scrollbar { display: none; }
 
   .uno-hand-rail__slot {
     position: relative;
     flex: 0 0 auto;
     transform-origin: 50% 100%;
-    transition: transform 0.22s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .uno-hand-rail__slot:not(:first-child) {
     margin-left: calc(-1 * (var(--uno-card-w) - var(--uno-hand-peek)));
   }
+
+  /* Immersive table background texture */
+  .uno-table-surface {
+    background-color: var(--background);
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 80%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-blend-mode: overlay;
+    opacity: 0.4;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
 }
 
 @theme inline {
-  --font-sans: 'Geist Variable', sans-serif;
-  --font-heading: var(--font-sans);
+  --font-sans: 'Outfit', 'Inter', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -313,116 +350,73 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Light UNO shell: warm paper + sunny yellow CTAs (same accent language as `.dark`). */
 :root {
-  --background: oklch(0.985 0.014 95);
-  --foreground: oklch(0.24 0.045 270);
-  --card: oklch(0.995 0.01 95);
-  --card-foreground: oklch(0.24 0.045 270);
-  --popover: oklch(0.995 0.01 95);
-  --popover-foreground: oklch(0.24 0.045 270);
-  --primary: oklch(0.86 0.16 92);
-  --primary-foreground: oklch(0.22 0.06 270);
-  --secondary: oklch(0.96 0.022 95);
-  --secondary-foreground: oklch(0.28 0.04 270);
-  --muted: oklch(0.945 0.02 95);
-  --muted-foreground: oklch(0.48 0.03 270);
-  --accent: oklch(0.94 0.03 95);
-  --accent-foreground: oklch(0.24 0.045 270);
-  --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.9 0.025 95);
-  --input: oklch(0.92 0.02 95);
-  --ring: oklch(0.72 0.14 92);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.98 0.012 95);
-  --sidebar-foreground: oklch(0.24 0.045 270);
-  --sidebar-primary: oklch(0.86 0.16 92);
-  --sidebar-primary-foreground: oklch(0.22 0.06 270);
-  --sidebar-accent: oklch(0.95 0.02 95);
-  --sidebar-accent-foreground: oklch(0.28 0.04 270);
-  --sidebar-border: oklch(0.9 0.025 95);
-  --sidebar-ring: oklch(0.72 0.14 92);
+  --background: oklch(0.96 0.02 95);
+  --foreground: oklch(0.2 0.04 270);
+  --card: rgba(255, 255, 255, 0.8);
+  --card-foreground: oklch(0.2 0.04 270);
+  --popover: oklch(0.99 0.01 95);
+  --popover-foreground: oklch(0.2 0.04 270);
+  --primary: oklch(0.85 0.18 92);
+  --primary-foreground: oklch(0.2 0.04 270);
+  --secondary: oklch(0.94 0.03 95);
+  --secondary-foreground: oklch(0.25 0.04 270);
+  --muted: oklch(0.92 0.02 95);
+  --muted-foreground: oklch(0.45 0.03 270);
+  --accent: oklch(0.92 0.04 95);
+  --accent-foreground: oklch(0.2 0.04 270);
+  --destructive: oklch(0.55 0.2 25);
+  --border: oklch(0.88 0.03 95);
+  --input: oklch(0.9 0.03 95);
+  --ring: oklch(0.7 0.15 92);
+  --radius: 0.75rem;
 }
 
-/* Dark UNO shell: deep indigo canvas + warm yellow primary for CTAs */
 .dark {
-  --background: oklch(0.17 0.05 270);
-  --foreground: oklch(0.96 0.02 95);
-  --card: oklch(0.22 0.055 270);
-  --card-foreground: oklch(0.96 0.02 95);
-  --popover: oklch(0.21 0.055 270);
-  --popover-foreground: oklch(0.96 0.02 95);
-  --primary: oklch(0.88 0.17 92);
-  --primary-foreground: oklch(0.2 0.04 270);
-  --secondary: oklch(0.28 0.06 270);
-  --secondary-foreground: oklch(0.96 0.02 95);
-  --muted: oklch(0.28 0.04 270);
-  --muted-foreground: oklch(0.72 0.03 95);
-  --accent: oklch(0.3 0.08 270);
-  --accent-foreground: oklch(0.96 0.02 95);
-  --destructive: oklch(0.58 0.22 25);
-  --border: oklch(0.96 0.02 95 / 12%);
-  --input: oklch(0.96 0.02 95 / 14%);
-  --ring: oklch(0.78 0.14 92);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.2 0.05 270);
-  --sidebar-foreground: oklch(0.96 0.02 95);
-  --sidebar-primary: oklch(0.88 0.17 92);
-  --sidebar-primary-foreground: oklch(0.2 0.04 270);
-  --sidebar-accent: oklch(0.28 0.06 270);
-  --sidebar-accent-foreground: oklch(0.96 0.02 95);
-  --sidebar-border: oklch(0.96 0.02 95 / 12%);
-  --sidebar-ring: oklch(0.78 0.14 92);
+  --background: #0f172a;
+  --foreground: oklch(0.98 0.01 95);
+  --card: rgba(30, 41, 59, 0.7);
+  --card-foreground: oklch(0.98 0.01 95);
+  --popover: oklch(0.18 0.06 270);
+  --popover-foreground: oklch(0.98 0.01 95);
+  --primary: oklch(0.88 0.18 92);
+  --primary-foreground: oklch(0.15 0.05 270);
+  --secondary: oklch(0.25 0.07 270);
+  --secondary-foreground: oklch(0.98 0.01 95);
+  --muted: oklch(0.25 0.05 270);
+  --muted-foreground: oklch(0.75 0.03 95);
+  --accent: oklch(0.28 0.1 270);
+  --accent-foreground: oklch(0.98 0.01 95);
+  --destructive: oklch(0.55 0.22 25);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: oklch(0.8 0.16 92);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply min-h-dvh bg-background text-foreground font-sans antialiased;
-  }
+  * { @apply border-border outline-ring/50; }
+  body { @apply min-h-dvh bg-background text-foreground font-sans antialiased selection:bg-primary/30; }
 }
 
 @keyframes uno-pulse {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.12);
-  }
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.1); filter: brightness(1.2); }
 }
 
-/* Match “Players” heading: chevrons nudge with the live turn direction (clockwise vs counter). */
 @keyframes uno-dir-cw {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: translateX(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(5px);
-  }
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(6px); }
 }
 
 @keyframes uno-dir-ccw {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: translateX(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(-5px);
-  }
+  0%, 100% { opacity: 0.4; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(-6px); }
+}
+
+.glass {
+  @apply backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl;
+}
+
+.glass-dark {
+  @apply backdrop-blur-xl bg-black/20 border border-white/10 shadow-2xl;
 }

@@ -63,8 +63,12 @@ function hReverseGlyph(cls: string): VNode {
 function unoCardFaceChildren(card: Card): VNode[] {
   if (card.color === 'wild' && card.type === 'wild4') {
     return [
-      h('span', { class: 'uno-card__pip uno-card__pip--tl' }, '+4'),
-      h('span', { class: 'uno-card__pip uno-card__pip--br' }, '+4'),
+      h('span', { class: 'uno-card__pip uno-card__pip--tl' }, [
+        h('span', { class: 'uno-card__pip-inner' }, '+4')
+      ]),
+      h('span', { class: 'uno-card__pip uno-card__pip--br' }, [
+        h('span', { class: 'uno-card__pip-inner' }, '+4')
+      ]),
       h('div', { class: 'uno-card__wild4-bars', 'aria-hidden': 'true' }, [
         h('span', { class: 'uno-card__wild4-bar uno-card__wild4-bar--r' }),
         h('span', { class: 'uno-card__wild4-bar uno-card__wild4-bar--y' }),
@@ -196,13 +200,19 @@ export const PlayerPanel = defineComponent({
   setup(props) {
     return () => h('aside', {
       class: [
-        'relative flex min-w-0 flex-wrap items-center gap-2 rounded-full border border-border/80 bg-card/60 px-3 py-2 text-sm text-card-foreground shadow-sm backdrop-blur-md transition-[box-shadow,ring] sm:gap-2.5 sm:px-4',
-        props.active && 'z-[1] ring-2 ring-primary/70 ring-offset-2 ring-offset-background animate-[uno-pulse_0.65s_ease-in-out_infinite_alternate]',
+        'relative flex min-w-0 flex-wrap items-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-4 py-3 text-sm text-white shadow-xl backdrop-blur-xl transition-all duration-300 sm:gap-3',
+        props.active ? 'ring-2 ring-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] scale-[1.02]' : 'opacity-80 scale-95 hover:opacity-100',
       ],
     }, [
-      h('span', { class: 'text-lg leading-none', 'aria-hidden': 'true' }, displayPlayerAvatar(props.player.avatar)),
-      h('strong', { class: 'min-w-0 flex-1 truncate font-semibold' }, props.player.username),
-      h('small', { class: 'shrink-0 tabular-nums text-muted-foreground' }, `${props.cardCount} cards`),
+      h('div', { class: 'flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-white/20 to-white/5 text-2xl shadow-inner', 'aria-hidden': 'true' }, displayPlayerAvatar(props.player.avatar)),
+      h('div', { class: 'flex-1 min-w-0' }, [
+        h('strong', { class: 'block truncate font-bold tracking-tight text-base leading-tight' }, props.player.username),
+        h('small', { class: 'block tabular-nums text-primary/80 font-medium' }, `${props.cardCount} cards`),
+      ]),
+      props.active && h('div', { class: 'absolute -top-1 -right-1 flex size-3 items-center justify-center' }, [
+        h('span', { class: 'animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75' }),
+        h('span', { class: 'relative inline-flex rounded-full size-2 bg-primary' }),
+      ]),
     ]);
   },
 });
@@ -215,20 +225,21 @@ export const UnoButton = defineComponent({
     return () => h('button', {
       type: 'button',
       class: [
-        // Big red dome: inset highlight plus a thick base shadow so it reads like a physical button on the table.
-        'relative flex h-[4.75rem] w-[4.75rem] shrink-0 items-center justify-center rounded-full border-2 border-red-950/45 bg-gradient-to-b from-red-500 via-red-600 to-red-900 text-center text-[0.95rem] font-black leading-none tracking-[0.14em] text-white',
-        '[text-shadow:0_1px_0_rgb(0_0_0_/_45%)] shadow-[inset_0_3px_10px_rgb(255_255_255_/_38%),inset_0_-7px_14px_rgb(0_0_0_/_28%),0_6px_0_#7f1d1d,0_10px_22px_rgb(0_0_0_/_35%)]',
-        'transition-[transform,box-shadow,filter] duration-150 ease-out',
-        'enabled:cursor-pointer enabled:hover:brightness-110 enabled:hover:-translate-y-0.5 enabled:hover:shadow-[inset_0_3px_10px_rgb(255_255_255_/_38%),inset_0_-7px_14px_rgb(0_0_0_/_28%),0_8px_0_#7f1d1d,0_14px_26px_rgb(0_0_0_/_38%)]',
-        'enabled:active:translate-y-1 enabled:active:brightness-105 enabled:active:shadow-[inset_0_8px_14px_rgb(0_0_0_/_35%),0_3px_0_#7f1d1d,0_6px_14px_rgb(0_0_0_/_28%)]',
-        'disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-[inset_0_5px_12px_rgb(0_0_0_/_25%)] disabled:brightness-95',
-        props.urgent && 'z-10 animate-[uno-pulse_0.65s_ease-in-out_infinite_alternate]',
+        'relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white/30 bg-gradient-to-b from-red-500 via-red-600 to-red-800 text-center text-xl font-black italic tracking-tighter text-white uppercase',
+        'shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5),inset_0_2px_10px_rgba(255,255,255,0.4),inset_0_-5px_15px_rgba(0,0,0,0.3)]',
+        'transition-all duration-200 ease-out active:scale-90 active:shadow-inner',
+        'enabled:cursor-pointer enabled:hover:brightness-110 enabled:hover:-translate-y-1',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale',
+        props.urgent && 'animate-pulse ring-4 ring-red-500/50 ring-offset-4 ring-offset-background',
       ],
       disabled: !props.enabled,
       onClick: () => emit('uno'),
-    }, 'UNO!');
+    }, [
+      h('span', { class: 'drop-shadow-lg' }, 'UNO!')
+    ]);
   },
 });
+
 
 export const DirectionArrow = defineComponent({
   name: 'DirectionArrow',
