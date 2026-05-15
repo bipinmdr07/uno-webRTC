@@ -730,19 +730,34 @@ function callUno() {
             <!-- Draw Pile -->
             <button 
               type="button"
-              class="group relative flex flex-col items-center gap-3 transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+              class="group relative flex flex-col items-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
               :disabled="!isMyTurn || match.state.status !== 'playing'"
               @click="drawFromDeck"
             >
-              <div class="relative">
+              <div 
+                class="relative"
+                :class="[
+                  isMyTurn ? 'animate-[uno-blink_2s_infinite]' : '',
+                  mustDrawNoPlayable ? 'animate-[uno-flicker_0.5s_ease-in-out_infinite]' : ''
+                ]"
+              >
                 <!-- Stacked card effect -->
                 <div class="absolute -inset-1 rounded-[1.1rem] bg-black/20 translate-y-2 translate-x-1" />
                 <div class="absolute -inset-1 rounded-[1.1rem] bg-black/20 translate-y-1 translate-x-0.5" />
-                <div class="uno-card uno-card--wild flex items-center justify-center border-white/40 bg-slate-900 shadow-2xl">
-                  <span class="text-4xl font-black italic tracking-tighter text-white/20 select-none">UNO</span>
+                <div 
+                  class="uno-card uno-card--wild flex items-center justify-center border-white/40 bg-slate-900 shadow-2xl transition-all"
+                  :class="isMyTurn ? 'brightness-125 scale-105 shadow-[0_0_50px_-5px_var(--primary)] border-primary' : ''"
+                >
+                  <span 
+                    class="text-4xl font-black italic tracking-tighter text-white/20 select-none"
+                    :class="isMyTurn ? 'text-primary/40' : ''"
+                  >UNO</span>
                 </div>
               </div>
-              <div class="glass px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
+              <div 
+                class="glass px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all duration-300"
+                :class="isMyTurn ? 'bg-primary text-primary-foreground border-primary scale-110 shadow-[0_0_20px_var(--primary)]' : ''"
+              >
                 Deck ({{ deckCount }})
               </div>
             </button>

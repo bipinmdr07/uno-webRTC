@@ -358,6 +358,7 @@
   --popover: oklch(0.99 0.01 95);
   --popover-foreground: oklch(0.2 0.04 270);
   --primary: oklch(0.85 0.18 92);
+  --primary-rgb: 250, 204, 21;
   --primary-foreground: oklch(0.2 0.04 270);
   --secondary: oklch(0.94 0.03 95);
   --secondary-foreground: oklch(0.25 0.04 270);
@@ -380,6 +381,7 @@
   --popover: oklch(0.18 0.06 270);
   --popover-foreground: oklch(0.98 0.01 95);
   --primary: oklch(0.88 0.18 92);
+  --primary-rgb: 255, 230, 0;
   --primary-foreground: oklch(0.15 0.05 270);
   --secondary: oklch(0.25 0.07 270);
   --secondary-foreground: oklch(0.98 0.01 95);
@@ -413,8 +415,27 @@
   50% { opacity: 1; transform: translateX(-6px); }
 }
 
+@keyframes uno-flicker {
+  0%, 100% { 
+    opacity: 1; 
+    filter: brightness(1.4) drop-shadow(0 0 25px var(--primary)); 
+    transform: scale(1.05);
+  }
+  50% { 
+    opacity: 0.9; 
+    filter: brightness(1.1) drop-shadow(0 0 10px var(--primary)); 
+    transform: scale(1.02);
+  }
+}
+
 .glass {
   @apply backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl;
+}
+
+@keyframes uno-blink {
+  0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(var(--primary-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0); }
 }
 
 .glass-dark {
