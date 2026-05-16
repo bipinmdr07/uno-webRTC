@@ -7,6 +7,10 @@ import type { GameEvent, GameState, Move, Player, Room } from '@uno/shared-types
 // room starts clean so old test sessions don't leak in.
 const STORAGE_KEY = 'uno.match.snapshot';
 
+/** Batches rapid JSON.stringify + sessionStorage writes while playing; flushed after last move in a burst. */
+let persistFlushTimer: ReturnType<typeof setTimeout> | null = null;
+const PERSIST_DEBOUNCE_MS = 280;
+
 interface PersistedMatch {
   roomId: string;
   state: GameState;
@@ -51,7 +55,7 @@ export const useMatchStore = defineStore('match', {
         payload: move,
       };
       this.state = reduceGameEvent(raw, event);
-      this.persist();
+      this.schedulePersist();
       return event;
     },
 
@@ -61,7 +65,7 @@ export const useMatchStore = defineStore('match', {
       const raw = toRaw(this.state);
       if (raw.eventLog.some((e) => e.eventId === event.eventId)) return;
       this.state = reduceGameEvent(raw, event);
-      this.persist();
+      this.schedulePersist();
     },
 
     /** Adopt a snapshot a peer sent us — used when we join late or refresh and need to catch up. */
@@ -72,13 +76,29 @@ export const useMatchStore = defineStore('match', {
 
     legal(playerId: string) { return this.state ? legalMoves(toRaw(this.state), playerId) : []; },
 
+    /** Coalesces writes while events arrive in bursts — cuts main-thread JSON churn mid-hand. */
+    schedulePersist() {
+      if (typeof sessionStorage === 'undefined') return;
+      if (persistFlushTimer != null) clearTimeout(persistFlushTimer);
+      persistFlushTimer = setTimeout(() => {
+        persistFlushTimer = null;
+        this.persist();
+      }, PERSIST_DEBOUNCE_MS);
+    },
+
     persist() {
       if (typeof sessionStorage === 'undefined') return;
       const room = this.room;
       if (!room || !this.state) return;
       try {
         const payload: PersistedMatch = { roomId: room.id, state: toRaw(this.state) };
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        const json = JSON.stringify(payload);
+        if (import.meta.dev && json.length > 450_000) {
+          console.warn(
+            `[uno] match snapshot is ${json.length} chars (${payload.state.eventLog.length} events); sessionStorage JSON on every burst is costly — profile with DevTools if this grows.`,
+          );
+        }
+        sessionStorage.setItem(STORAGE_KEY, json);
       } catch {
         // Storage might be full or blocked (private mode); losing the cache is fine,
         // peers will reconcile us via a snapshot when we reconnect.
@@ -102,6 +122,10 @@ export const useMatchStore = defineStore('match', {
 
     clearPersisted() {
       if (typeof sessionStorage === 'undefined') return;
+      if (persistFlushTimer != null) {
+        clearTimeout(persistFlushTimer);
+        persistFlushTimer = null;
+      }
       try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* nothing to do if storage is sealed off */ }
     },
   },

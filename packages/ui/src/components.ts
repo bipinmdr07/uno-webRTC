@@ -1,4 +1,5 @@
 import { computed, defineComponent, h, type PropType, type VNode } from 'vue';
+import { usePreferredReducedMotion } from '@vueuse/core';
 import { mayPlayCard, sortHand } from '@uno/game-engine';
 import { displayPlayerAvatar, type Card, type GameState, type Player } from '@uno/shared-types';
 
@@ -198,9 +199,10 @@ export const PlayerPanel = defineComponent({
     cardCount: { type: Number, required: true },
   },
   setup(props) {
+    const reduceMotion = usePreferredReducedMotion();
     return () => h('aside', {
       class: [
-        'relative flex min-w-0 flex-wrap items-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-4 py-3 text-sm text-white shadow-xl backdrop-blur-xl transition-all duration-300 sm:gap-3',
+        'relative flex min-w-0 flex-wrap items-center gap-2 rounded-2xl border border-white/20 bg-white/12 px-4 py-3 text-sm text-white shadow-xl transition-all duration-300 sm:gap-3',
         props.active ? 'ring-2 ring-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] scale-[1.02]' : 'opacity-80 scale-95 hover:opacity-100',
       ],
     }, [
@@ -210,7 +212,9 @@ export const PlayerPanel = defineComponent({
         h('small', { class: 'block tabular-nums text-primary/80 font-medium' }, `${props.cardCount} cards`),
       ]),
       props.active && h('div', { class: 'absolute -top-1 -right-1 flex size-3 items-center justify-center' }, [
-        h('span', { class: 'animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75' }),
+        ...(reduceMotion.value
+          ? []
+          : [h('span', { class: 'uno-decorative-anim animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75' })]),
         h('span', { class: 'relative inline-flex rounded-full size-2 bg-primary' }),
       ]),
     ]);
@@ -230,7 +234,7 @@ export const UnoButton = defineComponent({
         'transition-all duration-200 ease-out active:scale-90 active:shadow-inner',
         'enabled:cursor-pointer enabled:hover:brightness-110 enabled:hover:-translate-y-1',
         'disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale',
-        props.urgent && 'animate-pulse ring-4 ring-red-500/50 ring-offset-4 ring-offset-background',
+        props.urgent && 'uno-decorative-anim animate-pulse ring-4 ring-red-500/50 ring-offset-4 ring-offset-background',
       ],
       disabled: !props.enabled,
       onClick: () => emit('uno'),

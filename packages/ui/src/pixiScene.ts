@@ -2,9 +2,13 @@ import { Application, Container, Graphics, Text } from 'pixi.js';
 import { gsap } from 'gsap';
 import type { GameState } from '@uno/shared-types';
 
+/**
+ * Pixi teardown checklist: always pair `mountTableScene` with `unmountTableScene` (or equivalent)
+ * on route leave / component unmount — the ticker, WebGL context, and GSAP tweens will stick around otherwise.
+ */
 export async function mountTableScene(target: HTMLElement, state: GameState): Promise<Application> {
   const app = new Application();
-  await app.init({ resizeTo: target, backgroundAlpha: 0, antialias: true });
+  await app.init({ resizeTo: target, backgroundAlpha: 0, antialias: false });
   target.appendChild(app.canvas);
   const table = new Container();
   app.stage.addChild(table);
@@ -14,6 +18,12 @@ export async function mountTableScene(target: HTMLElement, state: GameState): Pr
   table.position.set(app.screen.width / 2, app.screen.height / 2);
   gsap.to(table.scale, { x: 1.03, y: 1.03, repeat: -1, yoyo: true, duration: 2.2, ease: 'sine.inOut' });
   return app;
+}
+
+/** Kills the breathe tween and tears down WebGL; pass the same `Application` returned from `mountTableScene`. */
+export function unmountTableScene(app: Application) {
+  gsap.killTweensOf(app.stage);
+  app.destroy(true, { children: true, texture: true });
 }
 
 export function seatPosition(index: number, total: number, radius: number): { x: number; y: number } {

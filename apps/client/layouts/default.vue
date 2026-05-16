@@ -16,7 +16,7 @@ const isDark = useDark({ initialValue: 'dark', storageKey: 'vueuse-color-scheme'
       />
       <div class="uno-table-surface" aria-hidden="true" />
       <header
-        class="sticky top-0 z-50 border-b border-white/10 bg-black/5 backdrop-blur-xl supports-[backdrop-filter]:bg-black/5"
+        class="sticky top-0 z-50 border-b border-white/10 bg-black/25 backdrop-blur-sm supports-[backdrop-filter]:bg-black/20"
       >
         <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <NuxtLink to="/" class="group flex items-center gap-3 font-bold tracking-tighter text-white">

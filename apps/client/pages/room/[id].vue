@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import ConfettiExplosion from 'vue-confetti-explosion';
-import { useWindowSize } from '@vueuse/core';
+import { useDocumentVisibility, usePreferredReducedMotion, useWindowSize } from '@vueuse/core';
 import { ChevronLeft, ChevronRight, Loader2, PartyPopper } from 'lucide-vue-next';
-import { nextTick, onBeforeMount, onMounted, toRaw, watch } from 'vue';
+import { nextTick, onBeforeMount, onMounted, onUnmounted, toRaw, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { DirectionArrow, HandRail, PlayerPanel, UnoButton, UnoCardFace } from '@uno/ui';
 import { canCallUno, finishedRoundStandings, firstPlayerIdForNextRound } from '@uno/game-engine';
@@ -131,8 +131,32 @@ const isMyTurn = computed(
 );
 
 const { width: winW, height: winH } = useWindowSize();
-const confettiStageWidth = computed(() => Math.max(winW.value, 360));
-const confettiStageHeight = computed(() => Math.max(winH.value, 640));
+const confettiStageWidth = computed(() => Math.min(Math.max(winW.value, 360), 960));
+const confettiStageHeight = computed(() => Math.min(Math.max(winH.value, 640), 1200));
+const prefersReducedMotion = usePreferredReducedMotion();
+const docVisibility = useDocumentVisibility();
+
+watch(
+  docVisibility,
+  (v) => {
+    if (!import.meta.client) return;
+    document.documentElement.classList.toggle('uno-tab-hidden', v === 'hidden');
+  },
+  { immediate: true },
+);
+
+/** Cheaper bursts on phones / low core count; zero when the OS asks for reduced motion. */
+const confettiParticleCount = computed(() => {
+  if (prefersReducedMotion.value) return 0;
+  const w = winW.value;
+  const cores = typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency ?? 4) : 4;
+  if (w < 480 || cores <= 4) return 64;
+  if (w < 900 || cores <= 8) return 110;
+  return 160;
+});
+
+const confettiForce = computed(() => (winW.value < 480 ? 0.36 : 0.48));
+
 const showVictoryConfetti = ref(false);
 const confettiPalette: string[] = ['#a786ff', '#fd8bbc', '#f97316', '#facc15', '#38bdf8', '#34d399'];
 
@@ -160,8 +184,8 @@ const nextRoundOpener = computed(() => {
 const turnDirChevron = computed(() => (match.state?.direction === 1 ? ChevronRight : ChevronLeft));
 const turnDirAnimClass = computed(() =>
   match.state?.direction === 1
-    ? 'animate-[uno-dir-cw_0.85s_ease-in-out_infinite]'
-    : 'animate-[uno-dir-ccw_0.85s_ease-in-out_infinite]',
+    ? 'uno-decorative-anim animate-[uno-dir-cw_0.85s_ease-in-out_infinite]'
+    : 'uno-decorative-anim animate-[uno-dir-ccw_0.85s_ease-in-out_infinite]',
 );
 
 const gameOverDismissed = ref(false);
@@ -185,6 +209,7 @@ const gameOverDialogOpen = computed({
 
 /** Remount the explosion component so vue-confetti-explosion runs a fresh burst for everyone. */
 async function triggerVictoryConfetti() {
+  if (prefersReducedMotion.value || confettiParticleCount.value <= 0) return;
   showVictoryConfetti.value = false;
   await nextTick();
   showVictoryConfetti.value = true;
@@ -483,6 +508,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (pollTimer) clearInterval(pollTimer);
   network.disconnect();
+  if (import.meta.client) document.documentElement.classList.remove('uno-tab-hidden');
 });
 
 function applyAndBroadcast(move: Move) {
@@ -539,7 +565,6 @@ function callUno() {
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col gap-8 pb-[max(1.5rem,env(safe-area-inset-bottom))] relative overflow-hidden">
-    <div class="uno-table-surface" aria-hidden="true" />
     <div class="flex flex-wrap items-start justify-between gap-4 relative z-10">
       <div class="glass px-4 py-2 rounded-xl">
         <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Match Room</p>
@@ -729,7 +754,7 @@ function callUno() {
             class="absolute inset-0 flex items-center justify-center pointer-events-none"
             :class="turnDirAnimClass"
           >
-            <div class="size-[20rem] sm:size-[28rem] rounded-full border-[12px] border-dashed border-white/5 opacity-20" />
+            <div class="size-[14rem] sm:size-[18rem] lg:size-[22rem] rounded-full border-[10px] border-dashed border-white/5 opacity-20" />
           </div>
 
           <div class="flex flex-wrap items-center justify-center gap-12 sm:gap-24 relative z-10">
@@ -741,10 +766,10 @@ function callUno() {
               @click="drawFromDeck"
             >
               <div 
-                class="relative"
+                class="relative uno-decorative-anim"
                 :class="[
                   isMyTurn ? 'animate-[uno-blink_2s_infinite]' : '',
-                  mustDrawNoPlayable ? 'animate-[uno-flicker_0.5s_ease-in-out_infinite]' : ''
+                  mustDrawNoPlayable ? 'animate-[uno-flicker_0.5s_ease-in-out_infinite] shadow-[0_0_28px_-4px_var(--primary)]' : ''
                 ]"
               >
                 <!-- Stacked card effect -->
@@ -752,7 +777,7 @@ function callUno() {
                 <div class="absolute -inset-1 rounded-[1.1rem] bg-black/20 translate-y-1 translate-x-0.5" />
                 <div 
                   class="uno-card uno-card--wild flex items-center justify-center border-white/40 bg-slate-900 shadow-2xl transition-all"
-                  :class="isMyTurn ? 'brightness-125 scale-105 shadow-[0_0_50px_-5px_var(--primary)] border-primary' : ''"
+                  :class="isMyTurn ? 'scale-105 border-primary ring-2 ring-primary/35 shadow-[0_0_40px_-6px_var(--primary)]' : ''"
                 >
                   <span 
                     class="text-4xl font-black italic tracking-tighter text-white/20 select-none"
@@ -771,7 +796,7 @@ function callUno() {
             <!-- Discard Pile -->
             <div class="flex flex-col items-center gap-3">
               <div class="relative">
-                <div class="absolute -inset-4 rounded-full bg-white/5 blur-2xl" />
+                <div class="absolute -inset-4 rounded-full bg-white/5 blur-md" />
                 <UnoCardFace v-if="topDiscard" :card="topDiscard" class="relative z-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
                 <div v-else class="uno-card border-dashed border-white/10 bg-white/5" />
               </div>
@@ -779,7 +804,7 @@ function callUno() {
                 class="glass px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg flex items-center gap-2"
                 :style="activeColorStyle"
               >
-                <span class="size-2 rounded-full bg-white animate-pulse" />
+                <span class="size-2 rounded-full bg-white uno-decorative-anim animate-pulse" />
                 {{ match.state.currentColor || 'No Color' }}
               </div>
             </div>
@@ -896,13 +921,13 @@ function callUno() {
         aria-hidden="true"
       >
         <ConfettiExplosion
-          v-if="showVictoryConfetti"
+          v-if="showVictoryConfetti && confettiParticleCount > 0"
           class="absolute left-1/2 top-[min(22vh,200px)] -translate-x-1/2"
-          :particle-count="220"
-          :force="0.52"
+          :particle-count="confettiParticleCount"
+          :force="confettiForce"
           :stage-width="confettiStageWidth"
           :stage-height="confettiStageHeight"
-          :duration="3000"
+          :duration="2600"
           :colors="confettiPalette"
         />
       </div>
