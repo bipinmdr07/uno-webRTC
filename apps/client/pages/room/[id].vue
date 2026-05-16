@@ -2,7 +2,7 @@
 import ConfettiExplosion from 'vue-confetti-explosion';
 import { useWindowSize } from '@vueuse/core';
 import { ChevronLeft, ChevronRight, Loader2, PartyPopper } from 'lucide-vue-next';
-import { nextTick, toRaw, watch } from 'vue';
+import { nextTick, onBeforeMount, onMounted, toRaw, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { DirectionArrow, HandRail, PlayerPanel, UnoButton, UnoCardFace } from '@uno/ui';
 import { canCallUno, finishedRoundStandings, firstPlayerIdForNextRound } from '@uno/game-engine';
@@ -31,11 +31,13 @@ const roomId = computed(() => String(route.params.id));
 const room = ref<Room | null>(null);
 const joinError = ref<string | null>(null);
 const startError = ref<string | null>(null);
-const joining = ref(true);
+// Invitees with ?token= hit the profile gate first — they must not inherit a "joining" spinner before
+// mount runs; tunnel/CF script errors can block onMounted and leave that stuck forever.
+const joining = ref(false);
 const starting = ref(false);
-const joinProfileReady = ref(
-  import.meta.client && sessionStorage.getItem(`uno.roomJoinProfile:${String(route.params.id)}`) === '1',
-);
+// Start false on SSR and on first client tick so hydration never disagrees with sessionStorage;
+// sync the real flag in onBeforeMount before the join gate in onMounted runs.
+const joinProfileReady = ref(false);
 const joinNameError = ref<string | null>(null);
 
 const router = useRouter();
@@ -463,6 +465,10 @@ async function submitJoinProfile() {
   identity.persist();
   await joinRoom();
 }
+
+onBeforeMount(() => {
+  joinProfileReady.value = sessionStorage.getItem(joinProfileStorageKey()) === '1';
+});
 
 onMounted(() => {
   identity.restore();

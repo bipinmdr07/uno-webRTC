@@ -4,7 +4,7 @@ import { Moon, Sun } from 'lucide-vue-next';
 const route = useRoute();
 const showHome = computed(() => route.path !== '/');
 /** Puts `dark` on `<html>` so Tailwind’s `dark:` variant and `.dark { … }` tokens both apply. */
-const isDark = useDark({ initialValue: 'dark' });
+const isDark = useDark({ initialValue: 'dark', storageKey: 'vueuse-color-scheme' });
 </script>
 
 <template>

@@ -2,9 +2,20 @@ import tailwindcss from '@tailwindcss/vite';
 
 const publicApiBase = process.env.NUXT_PUBLIC_API_BASE ?? (process.env.NODE_ENV === 'production' ? 'http://localhost:4100' : '/api');
 
+/** Public deploy (e.g. Cloudflare in front of a tunnel): turn off Rocket Loader and Web Analytics on the zone if module scripts or Third-party beacons break the app; ship a production build, not `nuxt dev`, through the tunnel. */
 export default defineNuxtConfig({
   app: {
     head: {
+      // Default dark so SSR matches `.dark` CSS variables; narrow inline script aligns with `plugins/theme.client.ts` and `useDark` storageKey `vueuse-color-scheme`.
+      htmlAttrs: {
+        class: 'dark',
+      },
+      script: [
+        {
+          key: 'uno-vueuse-theme-sync',
+          innerHTML: `(function(){try{var k='vueuse-color-scheme';if(localStorage.getItem(k)==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark')}catch(_){document.documentElement.classList.add('dark')}})()`,
+        },
+      ],
       // Load fonts here instead of @import in tailwind.css — Vite can treat external CSS
       // @imports as JS module deps on client navigations, which breaks hydration (MIME text/css).
       link: [
