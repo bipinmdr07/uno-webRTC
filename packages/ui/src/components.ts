@@ -60,27 +60,44 @@ function hReverseGlyph(cls: string): VNode {
   ]);
 }
 
-/** Renders the classic UNO face: corner pips + tilted white oval (or wild layouts). No bitmap assets. */
+/** Small 4-color pie for wild card corner pips. */
+function hRainbowPip(): VNode {
+  return h('span', { class: 'uno-card__rainbow-pip' }, [
+    h('span'), h('span'), h('span'), h('span'),
+  ]);
+}
+
+/** Renders the authentic UNO face: corner pips + tilted white oval (or wild/wild4 layouts). No bitmap assets. */
 function unoCardFaceChildren(card: Card): VNode[] {
   if (card.color === 'wild' && card.type === 'wild4') {
     return [
       h('span', { class: 'uno-card__pip uno-card__pip--tl' }, [
-        h('span', { class: 'uno-card__pip-inner' }, '+4')
+        h('span', { class: 'uno-card__pip-inner' }, '+4'),
+        hRainbowPip(),
       ]),
       h('span', { class: 'uno-card__pip uno-card__pip--br' }, [
-        h('span', { class: 'uno-card__pip-inner' }, '+4')
+        h('span', { class: 'uno-card__pip-inner' }, '+4'),
+        hRainbowPip(),
       ]),
-      h('div', { class: 'uno-card__wild4-bars', 'aria-hidden': 'true' }, [
-        h('span', { class: 'uno-card__wild4-bar uno-card__wild4-bar--r' }),
-        h('span', { class: 'uno-card__wild4-bar uno-card__wild4-bar--y' }),
-        h('span', { class: 'uno-card__wild4-bar uno-card__wild4-bar--g' }),
-        h('span', { class: 'uno-card__wild4-bar uno-card__wild4-bar--b' }),
+      h('div', { class: 'uno-card__wild4-center', 'aria-hidden': 'true' }, [
+        h('div', { class: 'uno-card__wild4-stack' }, [
+          h('span', { class: 'uno-card__wild4-rect uno-card__wild4-rect--r' }),
+          h('span', { class: 'uno-card__wild4-rect uno-card__wild4-rect--b' }),
+          h('span', { class: 'uno-card__wild4-rect uno-card__wild4-rect--y' }),
+          h('span', { class: 'uno-card__wild4-rect uno-card__wild4-rect--g' }),
+        ]),
       ]),
     ];
   }
 
   if (card.color === 'wild') {
     return [
+      h('span', { class: 'uno-card__pip uno-card__pip--tl' }, [
+        hRainbowPip(),
+      ]),
+      h('span', { class: 'uno-card__pip uno-card__pip--br' }, [
+        hRainbowPip(),
+      ]),
       h('div', { class: 'uno-card__wild-oval', 'aria-hidden': 'true' }, [
         h('span', { class: 'uno-card__wild-cell uno-card__wild-cell--r' }),
         h('span', { class: 'uno-card__wild-cell uno-card__wild-cell--y' }),
@@ -106,7 +123,13 @@ function unoCardFaceChildren(card: Card): VNode[] {
     if (card.type === 'number') {
       return h('span', { class: ['uno-card__center-glyph', pipClass('uno-card__center-inner')] }, String(card.value));
     }
-    if (card.type === 'draw2') return h('span', { class: 'uno-card__center-glyph uno-card__draw2' }, '+2');
+    if (card.type === 'draw2') {
+      return h('div', { class: 'uno-card__draw2-stack' }, [
+        h('span', { class: 'uno-card__draw2-rect uno-card__draw2-rect--back' }),
+        h('span', { class: 'uno-card__draw2-rect uno-card__draw2-rect--front' }),
+        h('span', { class: 'uno-card__draw2-label' }, '+2'),
+      ]);
+    }
     if (card.type === 'skip') return hSkipGlyph('uno-card__center-icon');
     return hReverseGlyph('uno-card__center-icon');
   };

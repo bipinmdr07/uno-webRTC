@@ -12,42 +12,39 @@
 
 @layer components {
   /*
-   * Classic UNO-style faces: thin white rim, colored field, white “stadium” oval tilted ~50°,
-   * corner pips in white. Wild / Wild +4 use black fields and simple vector shapes (no images).
-   * Default size is tuned for the overlapped hand rail; the discard uses the same face for consistency.
+   * Authentic UNO card faces — solid color body, white stadium oval tilted ~50°,
+   * outlined numbers with text-stroke, corner pips. Wild / Wild +4 use black bodies.
+   * Default size is tuned for the overlapped hand rail; the discard reuses the same face.
    */
-  /* Shared width token so the hand overlap math stays in sync with the painted card. */
   .uno-card {
     --uno-card-w: 8.5rem;
     --uno-face: #0a0a0a;
+    --uno-body: #333;
+    --uno-stroke: #000;
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
     width: var(--uno-card-w);
-    height: calc(var(--uno-card-w) * 3 / 2);
+    height: calc(var(--uno-card-w) * 1.5);
     margin: 0;
     padding: 0;
     flex: 0 0 auto;
-    border-radius: 1.1rem;
-    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 0.85rem;
+    border: 3.5px solid rgba(220, 220, 220, 0.95);
     color: #fff;
-    box-shadow: 
-      0 10px 30px -5px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(0, 0, 0, 0.1),
-      inset 0 0 15px rgba(255, 255, 255, 0.1);
+    background-color: var(--uno-body);
+    box-shadow:
+      0 6px 18px -4px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(0, 0, 0, 0.08);
     transition:
       transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
       filter 250ms ease,
       box-shadow 250ms ease;
-    font-family: ui-rounded, system-ui, sans-serif;
+    font-family: 'Arial Black', 'Arial', ui-rounded, system-ui, sans-serif;
     font-weight: 900;
     line-height: 1;
     text-align: center;
     contain: layout;
-    background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 2px 2px;
   }
 
   button.uno-card {
@@ -63,10 +60,10 @@
 
   .uno-card--eligible {
     transform: translateY(-2.5rem) scale(1.08) rotate(2deg);
-    filter: brightness(1.15) saturate(1.1);
+    filter: brightness(1.12) saturate(1.1);
     box-shadow:
       0 25px 50px -12px rgba(0, 0, 0, 0.6),
-      0 0 0 2px rgba(255, 255, 255, 1),
+      0 0 0 2.5px rgba(255, 255, 255, 1),
       0 0 30px 5px var(--primary);
     z-index: 50 !important;
   }
@@ -76,96 +73,99 @@
     opacity: 0.8;
   }
 
+  /* ── Authentic UNO color palette ── */
   .uno-card--red {
-    --uno-face: #c51605;
-    background-color: #ef4444;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%),
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    --uno-face: #d72600;
+    --uno-body: #d72600;
+    --uno-stroke: #8b1a00;
+    background-color: #d72600;
   }
   .uno-card--yellow {
-    --uno-face: #a16207;
-    background-color: #facc15;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 40%),
-      linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    --uno-face: #EDD308;
+    --uno-body: #EDD308;
+    --uno-stroke: #9e8d00;
+    background-color: #EDD308;
   }
   .uno-card--green {
-    --uno-face: #14532d;
-    background-color: #22c55e;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%),
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    --uno-face: #379711;
+    --uno-body: #379711;
+    --uno-stroke: #1d5a08;
+    background-color: #379711;
   }
   .uno-card--blue {
-    --uno-face: #1e3a8a;
-    background-color: #3b82f6;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15), transparent 40%),
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    --uno-face: #0956BF;
+    --uno-body: #0956BF;
+    --uno-stroke: #063a80;
+    background-color: #0956BF;
   }
 
   .uno-card--wild,
   .uno-card--wild4 {
-    --uno-face: #fff;
-    background-color: #111827;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), transparent 40%),
-      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    --uno-face: #222;
+    --uno-body: #1a1a1a;
+    --uno-stroke: #000;
+    background-color: #1a1a1a;
   }
 
+  /* ── Corner pips ── */
   .uno-card__pip {
     position: absolute;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     color: #fff;
-    font-size: 1.3rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-size: 1.1rem;
+    text-shadow:
+      -1px -1px 0 var(--uno-stroke),
+       1px -1px 0 var(--uno-stroke),
+      -1px  1px 0 var(--uno-stroke),
+       1px  1px 0 var(--uno-stroke),
+       0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   .uno-card__pip--tl {
-    top: 0.5rem;
-    left: 0.5rem;
+    top: 0.35rem;
+    left: 0.4rem;
   }
 
   .uno-card__pip--br {
-    bottom: 0.5rem;
-    right: 0.5rem;
+    bottom: 0.35rem;
+    right: 0.4rem;
     transform: rotate(180deg);
   }
 
   .uno-card__pip-inner {
     display: block;
-    font-size: 1.4rem;
+    font-size: 1.25rem;
     letter-spacing: -0.05em;
+    font-weight: 900;
+    -webkit-text-stroke: 1.5px var(--uno-stroke);
+    paint-order: stroke fill;
   }
 
   .uno-card__pip--orient,
   .uno-card__center-inner.uno-card__pip--orient {
     text-decoration: underline;
-    text-underline-offset: 0.06em;
-    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.04em;
+    text-decoration-thickness: 0.12em;
+    text-decoration-color: var(--uno-stroke);
   }
 
   .uno-card__pip-icon,
   .uno-card__center-icon {
     display: block;
-    color: currentcolor;
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+    color: #fff;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
   }
 
   .uno-card__pip-icon {
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 1.4rem;
+    height: 1.4rem;
   }
 
+  /* ── Center white oval ── */
   .uno-card__oval {
     position: absolute;
     left: 50%;
@@ -174,36 +174,87 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 84%;
-    height: 50%;
-    background: #ffffff;
+    width: 88%;
+    height: 56%;
+    background: #fff;
     border-radius: 999px;
     transform: translate(-50%, -50%) rotate(-52deg);
-    box-shadow: 
-      0 4px 10px rgba(0, 0, 0, 0.1),
-      inset 0 -2px 5px rgba(0, 0, 0, 0.05);
+    border: 3px solid var(--uno-body);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.12);
     color: var(--uno-face);
   }
 
   .uno-card__center-glyph {
     transform: rotate(52deg);
-    font-size: 3.8rem;
+    font-size: 4.2rem;
     letter-spacing: -0.05em;
-    line-height: 0.8;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 0.85;
+    color: var(--uno-face);
+    -webkit-text-stroke: 3px var(--uno-stroke);
+    paint-order: stroke fill;
   }
 
   .uno-card__draw2 {
-    font-size: 2.8rem;
-    letter-spacing: -0.08em;
+    font-size: 2.6rem;
+    letter-spacing: -0.06em;
   }
 
   .uno-card__center-icon {
-    width: 5.5rem;
-    height: 5.5rem;
+    width: 5rem;
+    height: 5rem;
     transform: rotate(52deg);
+    color: #fff;
+    filter:
+      drop-shadow(0 0 0 var(--uno-stroke))
+      drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
   }
 
+  /* ── Draw 2 center: stacked card rectangles ── */
+  .uno-card__draw2-stack {
+    position: relative;
+    transform: rotate(52deg);
+    width: 4.5rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .uno-card__draw2-rect {
+    position: absolute;
+    width: 2.2rem;
+    height: 3rem;
+    border-radius: 0.25rem;
+    border: 2.5px solid #fff;
+    background: var(--uno-face);
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .uno-card__draw2-rect--back {
+    transform: translate(-15%, -8%) rotate(-8deg);
+    z-index: 1;
+  }
+
+  .uno-card__draw2-rect--front {
+    transform: translate(15%, 5%) rotate(8deg);
+    z-index: 2;
+  }
+
+  .uno-card__draw2-label {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.2rem;
+    z-index: 3;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    -webkit-text-stroke: 1.5px var(--uno-stroke);
+    paint-order: stroke fill;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ── Wild card oval: 4 color quadrants ── */
   .uno-card__wild-oval {
     position: absolute;
     left: 50%;
@@ -212,61 +263,112 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    width: 80%;
-    height: 48%;
+    width: 82%;
+    height: 52%;
     overflow: hidden;
     border-radius: 999px;
-    transform: translate(-50%, -50%) rotate(-50deg);
-    outline: 5px solid #fff;
+    transform: translate(-50%, -50%) rotate(-52deg);
+    outline: 4px solid #fff;
     outline-offset: -1px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
   }
 
-  .uno-card__wild-cell--r { background-color: #ef4444; }
-  .uno-card__wild-cell--y { background-color: #facc15; }
-  .uno-card__wild-cell--g { background-color: #22c55e; }
-  .uno-card__wild-cell--b { background-color: #3b82f6; }
+  .uno-card__wild-cell--r { background-color: #d72600; }
+  .uno-card__wild-cell--y { background-color: #EDD308; }
+  .uno-card__wild-cell--g { background-color: #379711; }
+  .uno-card__wild-cell--b { background-color: #0956BF; }
 
-  .uno-card__wild4-bars {
-    position: absolute;
-    inset: 0.8rem;
-    z-index: 1;
-    pointer-events: none;
+  /* ── Rainbow pip circle (for wild card corners) ── */
+  .uno-card__rainbow-pip {
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 50%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    margin-top: 0.15rem;
   }
 
-  .uno-card__wild4-bar {
+  .uno-card__rainbow-pip span:nth-child(1) { background: #d72600; }
+  .uno-card__rainbow-pip span:nth-child(2) { background: #0956BF; }
+  .uno-card__rainbow-pip span:nth-child(3) { background: #EDD308; }
+  .uno-card__rainbow-pip span:nth-child(4) { background: #379711; }
+
+  /* ── Wild +4: overlapping colored card rectangles ── */
+  .uno-card__wild4-center {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 40%;
-    height: 60%;
-    margin: -30% 0 0 -20%;
-    border-radius: 0.25rem;
-    border: 2px solid rgba(0, 0, 0, 0.15);
-    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    width: 88%;
+    height: 56%;
+    border-radius: 999px;
+    background: #fff;
+    border: 3px solid #1a1a1a;
+    transform: translate(-50%, -50%) rotate(-52deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
 
-  .uno-card__wild4-bar--r {
-    background-color: #ef4444;
-    transform: rotate(-15deg) translate(-20%, -8%);
+  .uno-card__wild4-stack {
+    position: relative;
+    transform: rotate(52deg);
+    width: 5rem;
+    height: 4.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .uno-card__wild4-rect {
+    position: absolute;
+    width: 2rem;
+    height: 2.8rem;
+    border-radius: 0.2rem;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .uno-card__wild4-rect--r {
+    background: #d72600;
+    transform: translate(-45%, -15%) rotate(-15deg);
     z-index: 1;
   }
-  .uno-card__wild4-bar--y {
-    background-color: #facc15;
-    transform: rotate(-5deg) translate(5%, -3%);
+  .uno-card__wild4-rect--b {
+    background: #0956BF;
+    transform: translate(-15%, -5%) rotate(-5deg);
     z-index: 2;
   }
-  .uno-card__wild4-bar--g {
-    background-color: #22c55e;
-    transform: rotate(7deg) translate(20%, 3%);
+  .uno-card__wild4-rect--y {
+    background: #EDD308;
+    transform: translate(15%, 5%) rotate(5deg);
     z-index: 3;
   }
-  .uno-card__wild4-bar--b {
-    background-color: #3b82f6;
-    transform: rotate(20deg) translate(35%, 10%);
+  .uno-card__wild4-rect--g {
+    background: #379711;
+    transform: translate(40%, 15%) rotate(15deg);
     z-index: 4;
   }
 
+  .uno-card__wild4-label {
+    position: absolute;
+    top: -0.3rem;
+    right: -0.1rem;
+    z-index: 5;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #fff;
+    -webkit-text-stroke: 1.5px #000;
+    paint-order: stroke fill;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ── Hand rail ── */
   .uno-hand-rail {
     --uno-card-w: 8.5rem;
     --uno-hand-peek: 2.2rem;
