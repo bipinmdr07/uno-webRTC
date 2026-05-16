@@ -240,7 +240,7 @@ const drawnPlayableOffer = computed(() => {
 /** How many cards you take if you press Draw during a +2 / Wild +4 stack (stacking rules). */
 const pendingStackDraw = computed(() => {
   const s = match.state;
-  if (!s?.rules.stacking || s.pendingDraw <= 0) return 0;
+  if (!s || s.pendingDraw <= 0) return 0;
   return s.pendingDraw;
 });
 
@@ -761,7 +761,7 @@ function callUno() {
             <!-- Draw Pile -->
             <button 
               type="button"
-              class="group relative flex flex-col items-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+              class="group relative flex flex-col items-center gap-3 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100"
               :disabled="!isMyTurn || match.state.status !== 'playing'"
               @click="drawFromDeck"
             >
@@ -780,9 +780,15 @@ function callUno() {
                   :class="isMyTurn ? 'scale-105 border-primary ring-2 ring-primary/35 shadow-[0_0_40px_-6px_var(--primary)]' : ''"
                 >
                   <span 
-                    class="text-4xl font-black italic tracking-tighter text-white/20 select-none"
-                    :class="isMyTurn ? 'text-primary/40' : ''"
-                  >UNO</span>
+                    class="flex h-full w-full items-center justify-center font-black select-none transition-all duration-300 leading-none"
+                    :class="[
+                      pendingStackDraw > 0
+                        ? 'text-red-500 scale-110 text-5xl'
+                        : (isMyTurn ? 'text-primary/40 text-4xl italic tracking-tighter' : 'text-white/20 text-4xl italic tracking-tighter'),
+                    ]"
+                  >
+                    {{ pendingStackDraw > 0 ? `+${pendingStackDraw}` : 'UNO' }}
+                  </span>
                 </div>
               </div>
               <div 
